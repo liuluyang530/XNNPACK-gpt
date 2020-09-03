@@ -79,7 +79,8 @@ void DisableDenormals() {
       "ORR %[fpscr], #0x1000000\n"
       "VMSR fpscr, %[fpscr]\n"
     : [fpscr] "=r" (fpscr));
-#elif defined(__aarch64__)
+#elif defined(__aarch64__) || defined(__gptx__)
+
   uint64_t fpcr;
   __asm__ __volatile__(
       "MRS %[fpcr], fpcr\n"

@@ -78,7 +78,7 @@ void xnn_requantize_q31__neon(
     const int32x4_t z_scaled = vrshlq_s32(z_adjusted_product, vshift);
     const int32x4_t w_scaled = vrshlq_s32(w_adjusted_product, vshift);
 
-#ifdef __aarch64__
+#if defined(__aarch64__) || defined(__gptx__)
     const int16x8_t xy_packed = vqaddq_s16(vqmovn_high_s32(vqmovn_s32(x_scaled), y_scaled), vzero_point);
     const int16x8_t zw_packed = vqaddq_s16(vqmovn_high_s32(vqmovn_s32(z_scaled), w_scaled), vzero_point);
     const uint8x16_t xyzw_packed = vqmovun_high_s16(vqmovun_s16(xy_packed), zw_packed);

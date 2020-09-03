@@ -35,7 +35,8 @@ void xnn_requantize_precise__neon(
   assert(shift >= 24);
   assert(shift < 56);
 
-#if defined(__aarch64__)
+#if defined(__aarch64__) || defined(__gptx__)
+
   const int32x4_t vmultiplier = vdupq_n_s32(multiplier);
 #else
   const int32x2_t vmultiplier = vdup_n_s32(multiplier);
@@ -56,7 +57,8 @@ void xnn_requantize_precise__neon(
     const uint32x4_t z_neg_mask = vcltq_s32(z, vmovq_n_s32(0));
     const uint32x4_t w_neg_mask = vcltq_s32(w, vmovq_n_s32(0));
 
-#if defined(__aarch64__)
+#if defined(__aarch64__) || defined(__gptx__)
+
     const int64x2_t x01_product = vmull_s32(vget_low_s32(x), vget_low_s32(vmultiplier));
     const int64x2_t x23_product = vmull_high_s32(x, vmultiplier);
     const int64x2_t y01_product = vmull_s32(vget_low_s32(y), vget_low_s32(vmultiplier));
@@ -76,7 +78,8 @@ void xnn_requantize_precise__neon(
     const int64x2_t w23_product = vmull_s32(vget_high_s32(w), vmultiplier);
 #endif
 
-#if defined(__aarch64__)
+#if defined(__aarch64__) || defined(__gptx__)
+
     const int64x2_t x01_adjusted_product = vaddw_s32(x01_product, vreinterpret_s32_u32(vget_low_u32(x_neg_mask)));
     const int64x2_t x23_adjusted_product = vaddw_high_s32(x23_product, vreinterpretq_s32_u32(x_neg_mask));
     const int64x2_t y01_adjusted_product = vaddw_s32(y01_product, vreinterpret_s32_u32(vget_low_u32(y_neg_mask)));
@@ -105,7 +108,7 @@ void xnn_requantize_precise__neon(
     const int64x2_t w01_scaled = vrshlq_s64(w01_adjusted_product, vshift);
     const int64x2_t w23_scaled = vrshlq_s64(w23_adjusted_product, vshift);
 
-#ifdef __aarch64__
+#if defined(__aarch64__) || defined(__gptx__)
     const int32x4_t x_scaled = vuzp1q_s32(vreinterpretq_s32_s64(x01_scaled), vreinterpretq_s32_s64(x23_scaled));
     const int32x4_t y_scaled = vuzp1q_s32(vreinterpretq_s32_s64(y01_scaled), vreinterpretq_s32_s64(y23_scaled));
     const int32x4_t z_scaled = vuzp1q_s32(vreinterpretq_s32_s64(z01_scaled), vreinterpretq_s32_s64(z23_scaled));

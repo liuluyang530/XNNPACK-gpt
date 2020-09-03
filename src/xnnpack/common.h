@@ -33,7 +33,8 @@
   #define XNN_ARCH_ARM 0
 #endif
 
-#if defined(__aarch64__) || defined(_M_ARM64)
+#if defined(__aarch64__) || defined(_M_ARM64) || defined(__gptx__)
+
   #define XNN_ARCH_ARM64 1
 #else
   #define XNN_ARCH_ARM64 0
